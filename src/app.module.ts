@@ -9,16 +9,19 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthorsModule } from './authors/authors.module';
 import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
+import { Author } from './authors/entities/author.entity';
+import { User } from './users/entities/user.entity';
+import { Profile } from './profile/entities/profile.entity';
 
 @Module({
   imports: [BooksModule , TypeOrmModule.forRoot({
     type : 'mysql' ,
-    host : 'loalhost',
+    host : 'localhost',
     port : 3306 ,
     username : "aliSoltani" ,
     password : "mysql",
-    database : "graphql-librarydb",
-    entities: [Book],
+    database : "graphql_librarydb",
+    entities: [Book , Author , User , Profile],
     synchronize : true
   }) , GraphQLModule.forRoot<ApolloDriverConfig>({
     driver : ApolloDriver, 

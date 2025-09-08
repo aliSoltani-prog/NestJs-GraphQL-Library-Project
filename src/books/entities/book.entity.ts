@@ -19,7 +19,7 @@ export enum Genre{
     Historical ='Historical',
     Crime = 'Crime'
 }
-registerEnumType(Language , {name :" Language"})
+registerEnumType(Language , {name :"Language"})
 
 registerEnumType(Genre , { name : "Genre"})
 
@@ -48,7 +48,7 @@ export class Book {
   @Column({ nullable: true })
   translator: string;
 
-  @Field()
+  @Field(() => Int)
   @Column()
   edition: number;
 

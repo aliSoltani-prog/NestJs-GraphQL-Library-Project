@@ -26,7 +26,7 @@ export class Profile {
     @Column()
     dateOfbirth : Date
 
-    @Field({nullable : true})
+    @Field(() => User , {nullable : true})
     @OneToOne(()=> User , (user)=>user.profile)
     user? : User
 

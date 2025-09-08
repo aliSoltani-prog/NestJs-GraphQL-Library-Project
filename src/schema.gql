@@ -1,0 +1,165 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Author {
+  id: Int!
+  name: String!
+  dateOfBirth: DateTime!
+  nationality: String
+  books: [Book!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Book {
+  id: Int!
+  title: String!
+  author: Author
+  translator: String
+  edition: Int!
+  publisher: String!
+  language: Language!
+  genre: Genre!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  authorId: Int
+}
+
+enum Language {
+  Persian
+  English
+  Arabic
+}
+
+enum Genre {
+  Action
+  Romance
+  Comedy
+  Adventure
+  Horror
+  Fantasy
+  Historical
+  Crime
+}
+
+type Profile {
+  id: Int!
+  firstname: String!
+  lastname: String!
+  phoneNumber: String!
+  dateOfbirth: DateTime!
+  user: User
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type User {
+  id: Int!
+  username: String!
+  role: Roles!
+  email: String!
+  profile: Profile
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum Roles {
+  Admin
+  User
+  Guest
+}
+
+type Query {
+  books: [Book!]!
+  book(id: Int!): Book!
+  authors: [Author!]!
+  author(id: Int!): Author!
+  users: [User!]!
+  user(id: Int!): User!
+  profile(id: Int!): Profile!
+}
+
+type Mutation {
+  createBook(createBookInput: CreateBookInput!): Book!
+  updateBook(updateBookInput: UpdateBookInput!): Book!
+  removeBook(id: Int!): Book!
+  createAuthor(createAuthorInput: CreateAuthorInput!): Author!
+  updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
+  removeAuthor(id: Int!): Author!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createProfile(createProfileInput: CreateProfileInput!): Profile!
+  updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
+  removeProfile(id: Int!): Profile!
+}
+
+input CreateBookInput {
+  title: String!
+  authorId: Int
+  translator: String
+  edition: Int!
+  publisher: String!
+  language: Language! = Persian
+  genre: Genre! = Adventure
+}
+
+input UpdateBookInput {
+  title: String
+  authorId: Int
+  translator: String
+  edition: Int
+  publisher: String
+  language: Language = Persian
+  genre: Genre = Adventure
+  id: Int!
+}
+
+input CreateAuthorInput {
+  name: String!
+  dateOfBirth: DateTime!
+  nationality: String
+}
+
+input UpdateAuthorInput {
+  name: String
+  dateOfBirth: DateTime
+  nationality: String
+  id: Int!
+}
+
+input CreateUserInput {
+  username: String!
+  role: Roles! = Guest
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  username: String
+  role: Roles = Guest
+  email: String
+  password: String
+  id: Int!
+}
+
+input CreateProfileInput {
+  firstname: String!
+  lastname: String!
+  phoneNumber: String!
+  dateOfbirth: DateTime!
+}
+
+input UpdateProfileInput {
+  firstname: String
+  lastname: String
+  phoneNumber: String
+  dateOfbirth: DateTime
+  id: Int!
+}
