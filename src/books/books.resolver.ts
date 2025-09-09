@@ -9,27 +9,27 @@ export class BooksResolver {
   constructor(private readonly booksService: BooksService) {}
 
   @Mutation(() => Book)
-  createBook(@Args('createBookInput') createBookInput: CreateBookInput) {
+  async createBook(@Args('createBookInput') createBookInput: CreateBookInput) {
     return this.booksService.create(createBookInput);
   }
 
   @Query(() => [Book], { name: 'books' })
-  findAll() {
+  async findAll() {
     return this.booksService.findAll();
   }
 
   @Query(() => Book, { name: 'book' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  async findOne(@Args('id', { type: () => Int }) id: number) {
     return this.booksService.findOne(id);
   }
 
   @Mutation(() => Book)
-  updateBook(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
+  async updateBook(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
     return this.booksService.update(updateBookInput.id, updateBookInput);
   }
 
   @Mutation(() => Book)
-  removeBook(@Args('id', { type: () => Int }) id: number) {
+  async removeBook(@Args('id', { type: () => Int }) id: number) {
     return this.booksService.remove(id);
   }
 }
