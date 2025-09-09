@@ -4,31 +4,60 @@ import { UpdateBookInput } from './dto/update-book.input';
 import { Book } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Author } from 'src/authors/entities/author.entity';
 
 @Injectable()
 export class BooksService {
-  constructor(@InjectRepository(Book) private readonly bookrepo:Repository<Book>){}
+  constructor(@InjectRepository(Book) private readonly bookrepo:Repository<Book> ,
+@InjectRepository(Author) private readonly authorrepo:Repository<Author>){}
 
-  create(createBookInput: CreateBookInput) {
+  async create(createBookInput: CreateBookInput) {
   const newBook = this.bookrepo.create(createBookInput)
+      if (createBookInput.authorId) {
+      const author = await this.authorrepo.findOneBy({
+        id: createBookInput.authorId,
+      });
+      if (!author) {
+        throw new HttpException('Author not found', HttpStatus.BAD_REQUEST);
+      }
+      newBook.author = author; // 🔗 attach the relation
+    }
   return this.bookrepo.save(newBook)
   }
 
   findAll() {
-    return this.bookrepo.find();
+    return this.bookrepo.find({relations : ['author']});
   }
 
   async findOne(id: number) {
-    const isExist = await this.bookrepo.findOneBy({id})
+    const isExist = await this.bookrepo.findOne({ where : {id} , relations : ['author'] })
     if(!isExist) {throw new HttpException("Book did not found",HttpStatus.BAD_REQUEST)}
     return isExist
   }
 
-  async update(id: number, updateBookInput: UpdateBookInput) {
-    const isExist = await this.bookrepo.findOneBy({id : updateBookInput.id})
-    if(!isExist) {throw new HttpException("Book did not found",HttpStatus.BAD_REQUEST)}
-    Object.assign(isExist, updateBookInput);
-    return this.bookrepo.save(isExist);
+async update(id: number, updateBookInput: UpdateBookInput) {
+  const book = await this.bookrepo.findOne({
+    where: { id },
+    relations: ['author'], // make sure the current author is loaded
+  });
+
+  if (!book) {
+    throw new HttpException('Book not found', HttpStatus.BAD_REQUEST);
+  }
+
+  // Update regular fields
+  Object.assign(book, updateBookInput);
+
+  // Handle author relation if authorId is provided
+  if (updateBookInput.authorId) {
+    const author = await this.authorrepo.findOneBy({ id: updateBookInput.authorId });
+    if (!author) {
+      throw new HttpException('Author not found', HttpStatus.BAD_REQUEST);
+    }
+    book.author = author;
+  }
+
+  return this.authorrepo.save(book);
   }
 
   async remove(id: number) {

@@ -15,11 +15,11 @@ export class AuthorsService {
     }
   
     findAll() {
-      return this.authorrepo.find();
+      return this.authorrepo.find({relations : ['Books']});
     }
   
     async findOne(id: number) {
-      const isExist = await this.authorrepo.findOneBy({id})
+      const isExist = await this.authorrepo.findOne({where : { id } , relations:['Books']})
       if(!isExist) {throw new HttpException("Author did not found",HttpStatus.BAD_REQUEST)}
       return isExist
     }
