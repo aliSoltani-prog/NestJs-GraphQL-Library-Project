@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthorInput } from './dto/create-author.input';
 import { UpdateAuthorInput } from './dto/update-author.input';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Author } from './entities/author.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthorsService {
-  create(createAuthorInput: CreateAuthorInput) {
-    return 'This action adds a new author';
-  }
-
-  findAll() {
-    return `This action returns all authors`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
-  }
-
-  update(id: number, updateAuthorInput: UpdateAuthorInput) {
-    return `This action updates a #${id} author`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} author`;
-  }
+  constructor(@InjectRepository(Author) private readonly authorrepo:Repository<Author>){}
+  
+    create(createAuthorInput: CreateAuthorInput) {
+    const newAuthor = this.authorrepo.create(createAuthorInput)
+    return this.authorrepo.save(newAuthor)
+    }
+  
+    findAll() {
+      return this.authorrepo.find();
+    }
+  
+    async findOne(id: number) {
+      const isExist = await this.authorrepo.findOneBy({id})
+      if(!isExist) {throw new HttpException("Author did not found",HttpStatus.BAD_REQUEST)}
+      return isExist
+    }
+  
+    async update(id: number, updateAuthorInput: UpdateAuthorInput) {
+      const isExist = await this.authorrepo.findOneBy({id : updateAuthorInput.id})
+      if(!isExist) {throw new HttpException("Author did not found",HttpStatus.BAD_REQUEST)}
+      Object.assign(isExist, updateAuthorInput);
+      return this.authorrepo.save(isExist);
+    }
+  
+    async remove(id: number) {
+      const isExist = await this.authorrepo.findOneBy({id})
+      if(!isExist) {throw new HttpException("Author did not found",HttpStatus.BAD_REQUEST)}
+      await this.authorrepo.delete(id)
+      return isExist
+    }
 }
