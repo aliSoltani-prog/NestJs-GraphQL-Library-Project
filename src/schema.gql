@@ -82,7 +82,6 @@ type Query {
   author(id: Int!): Author!
   users: [User!]!
   user(id: Int!): User!
-  profile(id: Int!): Profile!
 }
 
 type Mutation {
@@ -95,9 +94,9 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
-  createProfile(createProfileInput: CreateProfileInput!): Profile!
-  updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
-  removeProfile(id: Int!): Profile!
+  createUserWithProfile(userInput: CreateUserInput!, profileInput: CreateProfileInput!): User!
+  createProfile(userId: Int!, createProfileInput: CreateProfileInput!): Profile!
+  updateProfile(profileId: Int!, updateProfileInput: CreateProfileInput!): Profile!
 }
 
 input CreateBookInput {
@@ -154,12 +153,4 @@ input CreateProfileInput {
   lastname: String!
   phoneNumber: String!
   dateOfbirth: DateTime!
-}
-
-input UpdateProfileInput {
-  firstname: String
-  lastname: String
-  phoneNumber: String
-  dateOfbirth: DateTime
-  id: Int!
 }

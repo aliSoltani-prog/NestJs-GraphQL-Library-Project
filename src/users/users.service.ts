@@ -22,11 +22,11 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userrepo.find();
+    return this.userrepo.find({relations : ['profile']});
   }
 
   async findOne(id: number) {
-    const isExist = await this.userrepo.findOneBy({id})
+    const isExist = await this.userrepo.findOne({where :{id}, relations:['profile']})
     if(!isExist) {throw new HttpException("user did not found",HttpStatus.BAD_REQUEST)}
     return isExist
   }
@@ -78,63 +78,39 @@ export class UsersService {
     return { ...user, profile };
   }
 
-
-  async updateUserWithProfile(
-  userId: number,
-  userInput: UpdateUserInput,
-  profileInput?: CreateProfileInput, // optional
-) {
-  // 1️⃣ Find the existing user along with the profile
+  async createProfile(userId: number, profileInput: CreateProfileInput) {
+  // 1️⃣ Check if user exists
   const user = await this.userrepo.findOne({
     where: { id: userId },
-    relations: ['profile'], // load profile relation
+    relations: ['profile'],
   });
-
   if (!user) {
     throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
-  // 2️⃣ Check for duplicate email/username
-  if (userInput.email) {
-    const duplicateEmail = await this.userrepo.findOne({
-      where: { email: userInput.email },
-    });
-    if (duplicateEmail && duplicateEmail.id !== userId) {
-      throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
-    }
+  // 2️⃣ Check if user already has a profile
+  if (user.profile) {
+    throw new HttpException(
+      'User already has a profile. Use update instead.',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
-  if (userInput.username) {
-    const duplicateUsername = await this.userrepo.findOne({
-      where: { username: userInput.username },
-    });
-    if (duplicateUsername && duplicateUsername.id !== userId) {
-      throw new HttpException('Username already in use', HttpStatus.BAD_REQUEST);
-    }
-  }
+  // 3️⃣ Create and link profile
+  const profile = this.profilerepo.create({ ...profileInput, user });
+  await this.profilerepo.save(profile);
 
-  // 3️⃣ Update user fields
-  Object.assign(user, userInput);
-
-  // 4️⃣ Handle profile update or creation
-  if (profileInput) {
-    let profile;
-    if (user.profile) {
-      // Profile exists → update it
-      Object.assign(user.profile, profileInput);
-      profile = await this.profilerepo.save(user.profile);
-    } else {
-      // No profile → create new one
-      profile = this.profilerepo.create({ ...profileInput, user });
-      await this.profilerepo.save(profile);
-      user.profile = profile;
-    }
-  }
-
-  // 5️⃣ Save user
-  await this.userrepo.save(user);
-
-  return user;
+  return profile;
 }
+async updateProfile(profileId: number, profileInput: CreateProfileInput) {
+  const profile = await this.profilerepo.findOneBy({ id: profileId });
+  if (!profile) {
+    throw new HttpException('Profile not found', HttpStatus.BAD_REQUEST);
+  }
+
+  Object.assign(profile, profileInput);
+  return this.profilerepo.save(profile);
+}
+
 
 }

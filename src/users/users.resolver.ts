@@ -3,6 +3,8 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { CreateProfileInput } from 'src/profile/dto/create-profile.input';
+import { Profile } from 'src/profile/entities/profile.entity';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -31,5 +33,30 @@ export class UsersResolver {
   @Mutation(() => User)
   async removeUser(@Args('id', { type: () => Int }) id: number) {
     return this.usersService.remove(id);
+  }
+  @Mutation(() => User)
+  createUserWithProfile(
+    @Args('userInput') userInput: CreateUserInput,
+    @Args('profileInput') profileInput: CreateProfileInput,
+  ) {
+    return this.usersService.createUserWithProfile(userInput, profileInput);
+  }
+
+  // 🟢 Create Profile for Existing User
+  @Mutation(() => Profile)
+  createProfile(
+    @Args('userId', { type: () => Int }) userId: number,
+    @Args('createProfileInput') createProfileInput: CreateProfileInput,
+  ) {
+    return this.usersService.createProfile(userId, createProfileInput);
+  }
+
+  // 🟢 Update Profile
+  @Mutation(() => Profile)
+  updateProfile(
+    @Args('profileId', { type: () => Int }) profileId: number,
+    @Args('updateProfileInput') updateProfileInput: CreateProfileInput,
+  ) {
+    return this.usersService.updateProfile(profileId, updateProfileInput);
   }
 }
