@@ -57,7 +57,7 @@ async update(id: number, updateBookInput: UpdateBookInput) {
     book.author = author;
   }
 
-  return this.authorrepo.save(book);
+  return this.bookrepo.save(book);
   }
 
   async remove(id: number) {
@@ -66,4 +66,17 @@ async update(id: number, updateBookInput: UpdateBookInput) {
     await this.bookrepo.delete(id)
     return isExist
   }
+
+  async findBookByTitle(title: string) {
+  const book = await this.bookrepo.findOne({
+    where: { title },
+    relations: ['author'], // include author relation
+  });
+
+  if (!book) {
+    throw new HttpException('Book not found', HttpStatus.BAD_REQUEST);
+  }
+
+  return book;
+}
 }

@@ -78,6 +78,7 @@ enum Roles {
 type Query {
   books: [Book!]!
   book(id: Int!): Book!
+  findBookByTitle(title: String!): Book!
   authors: [Author!]!
   author(id: Int!): Author!
   users: [User!]!

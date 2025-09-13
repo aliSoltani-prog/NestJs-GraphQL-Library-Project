@@ -32,4 +32,9 @@ export class BooksResolver {
   async removeBook(@Args('id', { type: () => Int }) id: number) {
     return this.booksService.remove(id);
   }
+
+  @Query(() => Book, { name: 'findBookByTitle' })
+  async findBookByTitle(@Args('title', { type: () => String }) title: string) {
+    return this.booksService.findBookByTitle(title);
+  }
 }
