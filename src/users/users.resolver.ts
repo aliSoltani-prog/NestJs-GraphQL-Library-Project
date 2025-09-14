@@ -44,9 +44,9 @@ export class UsersResolver {
 
   // 🟢 Create Profile for Existing User
   @Mutation(() => Profile)
-  createProfile(
+  async createProfile(
     @Args('userId', { type: () => Int }) userId: number,
-    @Args('createProfileInput') createProfileInput: CreateProfileInput,
+    @Args('createProfileInput') createProfileInput: CreateProfileInput, // name must match
   ) {
     return this.usersService.createProfile(userId, createProfileInput);
   }

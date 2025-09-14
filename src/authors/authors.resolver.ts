@@ -32,4 +32,9 @@ export class AuthorsResolver {
   async removeAuthor(@Args('id', { type: () => Int }) id: number) {
     return this.authorsService.remove(id);
   }
+
+  @Query(() => Author, { name: 'authorByName' })
+  async findAuthorByName(@Args('name') name: string) {
+    return this.authorsService.findAuthorByName(name);
+  }
 }

@@ -81,6 +81,7 @@ type Query {
   findBookByTitle(title: String!): Book!
   authors: [Author!]!
   author(id: Int!): Author!
+  authorByName(name: String!): Author!
   users: [User!]!
   user(id: Int!): User!
 }

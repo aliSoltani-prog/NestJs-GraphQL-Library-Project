@@ -37,4 +37,21 @@ export class AuthorsService {
       await this.authorrepo.delete(id)
       return isExist
     }
+
+    // src/authors/authors.service.ts
+async findAuthorByName(name: string) {
+  const author = await this.authorrepo.findOne({
+    where: { name },
+    relations: ['books'], // load related books
+  });
+
+  if (!author) {
+    throw new HttpException(
+      `Author with name "${name}" not found`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  return author;
+}
 }
