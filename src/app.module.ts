@@ -13,9 +13,14 @@ import { Author } from './authors/entities/author.entity';
 import { User } from './users/entities/user.entity';
 import { Profile } from './profile/entities/profile.entity';
 import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { GqlThrottlerGuard } from './guards/costum-guard/costum-guard.guard';
 
 @Module({
-  imports: [BooksModule , TypeOrmModule.forRoot({
+  imports: [ThrottlerModule.forRoot({
+    throttlers:[{ttl : 30000 , limit :30}]
+  }) ,BooksModule , TypeOrmModule.forRoot({
     type : 'mysql' ,
     host : 'localhost',
     port : 3306 ,
@@ -26,10 +31,15 @@ import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
     synchronize : true
   }) , GraphQLModule.forRoot<ApolloDriverConfig>({
     driver : ApolloDriver, 
-    autoSchemaFile : "src/schema.gql"
+    autoSchemaFile : "src/schema.gql",
+    context: ({ req, res }) => ({ req, res }),
   }), AuthorsModule, UsersModule, ProfileModule  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,GqlThrottlerGuard, // 👈 ensure it's registered
+  {
+    provide: APP_GUARD,
+    useClass: GqlThrottlerGuard,
+  },],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
