@@ -49,10 +49,10 @@ export class UsersService {
     return this.userrepo.find({relations : ['profile']});
   }
 
-  async findOne(id: number) {
-    const isExist = await this.userrepo.findOne({where :{id}, relations:['profile']})
-    if(!isExist) {throw new HttpException("user did not found",HttpStatus.BAD_REQUEST)}
-    return isExist
+  async findOne(id: number): Promise<User> {
+    const user = await this.userrepo.findOne({ where: { id }, relations: ['profile'] });
+    if (!user) throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    return user;
   }
 
   async update(id: number, updateUserInput: UpdateUserInput) {

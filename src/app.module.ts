@@ -31,10 +31,19 @@ import { AuthModule } from './auth/auth.module';
     entities: [Book , Author , User , Profile],
     synchronize : true
   }) , GraphQLModule.forRoot<ApolloDriverConfig>({
-    driver : ApolloDriver, 
-    autoSchemaFile : "src/schema.gql",
-    context: ({ req, res }) => ({ req, res }),
-  }), AuthorsModule, UsersModule, ProfileModule, AuthModule  ],
+  driver: ApolloDriver,
+  autoSchemaFile: 'src/schema.gql',
+  context: ({ req, res }) => {
+    // 👇 Extract role from headers and attach to req.user
+    const role = req.headers['x-user-role'] || 'guest';
+
+    req.user = {
+      role: role,
+    };
+
+    return { req, res };
+  },
+}), AuthorsModule, UsersModule, ProfileModule, AuthModule  ],
   controllers: [AppController],
   providers: [AppService,GqlThrottlerGuard, // 👈 ensure it's registered
   {
