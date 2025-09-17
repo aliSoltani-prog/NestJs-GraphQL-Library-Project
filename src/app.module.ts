@@ -16,6 +16,7 @@ import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlThrottlerGuard } from './guards/costum-guard/costum-guard.guard';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [ThrottlerModule.forRoot({
@@ -33,7 +34,7 @@ import { GqlThrottlerGuard } from './guards/costum-guard/costum-guard.guard';
     driver : ApolloDriver, 
     autoSchemaFile : "src/schema.gql",
     context: ({ req, res }) => ({ req, res }),
-  }), AuthorsModule, UsersModule, ProfileModule  ],
+  }), AuthorsModule, UsersModule, ProfileModule, AuthModule  ],
   controllers: [AppController],
   providers: [AppService,GqlThrottlerGuard, // 👈 ensure it's registered
   {

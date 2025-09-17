@@ -99,6 +99,7 @@ type Mutation {
   createUserWithProfile(userInput: CreateUserInput!, profileInput: CreateProfileInput!): User!
   createProfile(userId: Int!, createProfileInput: CreateProfileInput!): Profile!
   updateProfile(profileId: Int!, updateProfileInput: CreateProfileInput!): Profile!
+  login(loginInput: CreateAuthInput!): User!
 }
 
 input CreateBookInput {
@@ -155,4 +156,9 @@ input CreateProfileInput {
   lastname: String!
   phoneNumber: String!
   dateOfbirth: DateTime!
+}
+
+input CreateAuthInput {
+  username: String!
+  password: String!
 }

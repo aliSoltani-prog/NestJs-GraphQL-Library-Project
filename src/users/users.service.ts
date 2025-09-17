@@ -4,6 +4,7 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Profile } from 'src/profile/entities/profile.entity';
 import { CreateProfileInput } from 'src/profile/dto/create-profile.input';
 
@@ -13,12 +14,35 @@ export class UsersService {
  @InjectRepository(Profile)private readonly profilerepo: Repository<Profile>,){}
 
   async create(createUserInput: CreateUserInput) {
-    const isDuplicteEmail = await this.userrepo.findOneBy({email:createUserInput.email})
-    const isDuplicteUsername = await this.userrepo.findOneBy({username : createUserInput.username})
-    if(isDuplicteEmail){throw new HttpException("Email already in use",HttpStatus.BAD_REQUEST)}
-    else if(isDuplicteUsername){throw new HttpException("username already in use",HttpStatus.BAD_REQUEST)}
-    const newUser = this.userrepo.create(createUserInput)
-    return this.userrepo.save(newUser)
+    const isDuplicteEmail = await this.userrepo.findOneBy({
+      email: createUserInput.email,
+    });
+    const isDuplicteUsername = await this.userrepo.findOneBy({
+      username: createUserInput.username,
+    });
+
+    if (isDuplicteEmail) {
+      throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
+    } else if (isDuplicteUsername) {
+      throw new HttpException(
+        'username already in use',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // 🔑 hash the password before saving
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(
+      createUserInput.password,
+      saltRounds,
+    );
+
+    const newUser = this.userrepo.create({
+      ...createUserInput,
+      password: hashedPassword,
+    });
+
+    return this.userrepo.save(newUser);
   }
 
   findAll() {
@@ -69,14 +93,23 @@ export class UsersService {
 
 
     async createUserWithProfile(userInput: CreateUserInput, profileInput: CreateProfileInput) {
-    const user = this.userrepo.create(userInput);
-    await this.userrepo.save(user);
+  // 🔒 Hash the password before saving
+  const hashedPassword = await bcrypt.hash(userInput.password, 10);
 
-    const profile = this.profilerepo.create({ ...profileInput, user });
-    await this.profilerepo.save(profile);
+  // Create user with hashed password
+  const user = this.userrepo.create({
+    ...userInput,
+    password: hashedPassword,
+  });
+  await this.userrepo.save(user);
 
-    return { ...user, profile };
-  }
+  // Create profile linked to the user
+  const profile = this.profilerepo.create({ ...profileInput, user });
+  await this.profilerepo.save(profile);
+
+  // Return combined user + profile
+  return { ...user, profile };
+}
 
   async createProfile(userId: number, profileInput: CreateProfileInput) {
   // 1️⃣ Check if user exists
