@@ -5,6 +5,7 @@ import { Book } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Author } from 'src/authors/entities/author.entity';
+import { BookFilterInput } from './dto/filter-book.input';
 
 @Injectable()
 export class BooksService {
@@ -25,9 +26,23 @@ export class BooksService {
   return this.bookrepo.save(newBook)
   }
 
-  findAll() {
-    return this.bookrepo.find({relations : ['author']});
+async findAll(filter?: BookFilterInput): Promise<Book[]> {
+  const where: any = {};
+
+  if (filter?.language) {
+    where.language = filter.language;
   }
+
+  if (filter?.genre) {
+    where.genre = filter.genre;
+  }
+
+  return this.bookrepo.find({
+    where,
+    relations: ['author'],
+  });
+}
+
 
   async findOne(id: number) {
     const isExist = await this.bookrepo.findOne({ where : {id} , relations : ['author'] })

@@ -76,7 +76,7 @@ enum Roles {
 }
 
 type Query {
-  books: [Book!]!
+  books(filter: BookFilterInput): [Book!]!
   book(id: Int!): Book!
   findBookByTitle(title: String!): Book!
   authors: [Author!]!
@@ -84,6 +84,11 @@ type Query {
   authorByName(name: String!): Author!
   users: [User!]!
   user(id: Int!): User!
+}
+
+input BookFilterInput {
+  language: Language
+  genre: Genre
 }
 
 type Mutation {

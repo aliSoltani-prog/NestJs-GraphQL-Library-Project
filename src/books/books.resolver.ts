@@ -8,6 +8,7 @@ import { RolesGuard } from 'src/guards/roles-guard/roles-guard.guard';
 import { RoleDeco } from 'src/decorators/rolesdecorator/rolesdecorator.decorator';
 import { Roles } from 'src/users/entities/user.entity';
 import { GqlThrottlerGuard } from 'src/guards/costum-guard/costum-guard.guard';
+import { BookFilterInput } from './dto/filter-book.input';
 
 @UseGuards(RolesGuard)
 @Resolver(() => Book)
@@ -23,10 +24,11 @@ export class BooksResolver {
 
   @UseGuards(GqlThrottlerGuard)
   @RoleDeco(Roles.Admin , Roles.Guest , Roles.User)
-  @Query(() => [Book], { name: 'books' })
-  async findAll() {
-    return this.booksService.findAll();
-  }
+@Query(() => [Book], { name: 'books' })
+async findAll(@Args('filter', { nullable: true }) filter?: BookFilterInput) {
+  return this.booksService.findAll(filter);
+}
+
 
   @UseGuards(GqlThrottlerGuard)
   @RoleDeco(Roles.Admin , Roles.Guest , Roles.User)
