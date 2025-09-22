@@ -11,7 +11,18 @@ export class AuthResolver {
 
 
   @UseGuards(GqlThrottlerGuard)
-  @Mutation(() => User)
+  @Mutation(() => User , {description : `requirements :
+     query : 
+     mutation Login{
+  login(loginInput: { 
+    username: "ali", 
+    password: "123456" 
+  }) {
+    id
+    username
+    email
+  }
+}`})
   async login(@Args('loginInput') loginInput: CreateAuthInput): Promise<User> {
     const { username, password } = loginInput;
     const result = await this.authService.login(username, password);
